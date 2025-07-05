@@ -69,7 +69,7 @@ API буде доступне за адресою:
 | `GET`   | `/api/asset/prices?assetIds=1,2` | Отримати останні ціни для вказаних активів |
 | `GET`   | `/api/asset/{symbol}`            | Отримати інформацію про актив за символом |
 | `DELETE`| `/api/asset/symbol?symbol={symbol}` | Відписатися від активу та видалити його |
-| `GET`| `| `/api/asset/symbol?symbols={symbol}&symbols={symbol}` | Отримати інформацію про активи |
+| `GET`   |  `/api/asset/symbol?symbols={symbol}&symbols={symbol}` | Отримати інформацію про активи |
 
 ### Приклади запитів
 
