@@ -9,13 +9,10 @@
 ## 🧾 Зміст
 
 - [Опис](#опис)
-- [Передумови](#передумови)
 - [Запуск через Docker](#запуск-через-docker)
 - [Swagger](#swagger)
 - [API ендпоінти](#api-ендпоінти)
-- [Конфігурація](#конфігурація)
 - [Приклади використання](#приклади-використання)
-- [Зупинка та очищення](#зупинка-та-очищення)
 
 ---
 
@@ -30,16 +27,6 @@
 
 ---
 
-## 🛠 Передумови
-
-Перед запуском переконайтеся, що у вас встановлено:
-
-- [Docker](https://www.docker.com/get-started) (включаючи Docker Compose)
-- [Git](https://git-scm.com/downloads) (для клонування репозиторію)
-- Доступ до Fintacharts API (токен автентифікації)
-
----
-
 ## ▶️ Запуск через Docker
 
 ### 1. Клонувати репозиторій
@@ -48,25 +35,7 @@
 git clone https://github.com/your-repo-url.git
 cd WebSocket_API
 ```
-
-### 2. Налаштувати конфігурацію
-
-Переконайтеся, що файл `appsettings.json` містить коректний рядок підключення до бази даних та налаштування для Fintacharts API. Наприклад:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=db,1433;Database=FinancialInfo;User Id=sa;Password=MyStrength@ssword123;TrustServerCertificate=true"
-  },
-  "Fintacharts": {
-    "ApiUrl": "https://platform.fintacharts.com",
-    "WebSocketUrl": "wss://platform.fintacharts.com/api/streaming/ws/v1/realtime",
-    "Token": "your-fintacharts-token"
-  }
-}
-```
-
-### 3. Побудувати та запустити Docker-контейнери
+### 2. Побудувати та запустити Docker-контейнери
 
 ```bash
 docker-compose up --build -d
@@ -82,22 +51,10 @@ docker-compose up --build -d
 API буде доступне за адресою:
 🔗 [http://localhost:8080](http://localhost:8080)
 
-### 5. Перевірка стану
-
-Перегляньте логи для діагностики:
-```bash
-docker logs websocket_api-api-1
-docker logs websocket_api-db-1
-```
-
----
-
 ## 🧪 Swagger
 
 Інтерактивна документація API доступна через Swagger UI:
-🔗 [http://localhost:8080/swagger](http://localhost:8080/swagger)
-
-Swagger дозволяє тестувати ендпоінти, переглядати їх параметри та відповіді.
+🔗 [http://localhost:8080](http://localhost:8080)
 
 ---
 
@@ -109,6 +66,7 @@ Swagger дозволяє тестувати ендпоінти, перегляд
 | `GET`   | `/api/asset/prices?assetIds=1,2` | Отримати останні ціни для вказаних активів |
 | `GET`   | `/api/asset/{symbol}`            | Отримати інформацію про актив за символом |
 | `DELETE`| `/api/asset/symbol?symbol={symbol}` | Відписатися від активу та видалити його |
+| `GET`| `| `/api/asset/symbol?symbols={symbol}&symbols={symbol}` | Отримати інформацію про активи |
 
 ### Приклади запитів
 
@@ -124,43 +82,13 @@ Swagger дозволяє тестувати ендпоінти, перегляд
 
 3. **Отримати інформацію про актив**:
    ```bash
-   curl http://localhost:8080/api/asset/EUR%2FUSD?providerName=alpaca
+   curl http://localhost:8080/api/asset/symbol?symbol=EUR/FUSD?providerName=alpaca
    ```
 
 4. **Видалити актив**:
    ```bash
-   curl -X DELETE http://localhost:8080/api/asset/symbol?symbol=EUR%2FUSD
+   curl -X DELETE http://localhost:8080/api/asset/symbol?symbol=EUR/FUSD
    ```
-
----
-
-## ⚙️ Конфігурація
-
-- **База даних**: Використовується SQL Server у контейнері Docker. Рядок підключення задається у `appsettings.json` або через змінну середовища `ConnectionStrings__DefaultConnection`.
-- **Fintacharts API**: Налаштуйте токен і URL у `appsettings.json` для доступу до WebSocket та REST API Fintacharts.
-- **Логування**: Увімкнено детальне логування для діагностики (вимкніть `EnableSensitiveDataLogging` у продакшені).
-
-### Налаштування `appsettings.json`
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=db,1433;Database=FinancialInfo;User Id=sa;Password=MyStrength@ssword123;TrustServerCertificate=true"
-  },
-  "Fintacharts": {
-    "ApiUrl": "https://platform.fintacharts.com",
-    "WebSocketUrl": "wss://platform.fintacharts.com/api/streaming/ws/v1/realtime",
-    "Token": "your-fintacharts-token"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft": "Warning",
-      "Microsoft.EntityFrameworkCore": "Information"
-    }
-  }
-}
-```
 
 ---
 
@@ -220,54 +148,3 @@ info: WebSocket_API.Services.WebSocket.WebSocketSubscriptionService[0]
       Sent subscription request for InstrumentId: 914f3cf3-0d91-4240-b27e-6479d88df25c, Provider: alpaca
 ```
 
----
-
-## 🛑 Зупинка та очищення
-
-1. Зупинити контейнери:
-   ```bash
-   docker-compose down
-   ```
-
-2. Видалити контейнери, образи та томи (для повного очищення):
-   ```bash
-   docker-compose down -v --rmi all
-   ```
-
-**Примітка**: Видалення томів (`-v`) знищить дані в базі SQL Server. Використовуйте з обережністю.
-
----
-
-## 📚 Залежності
-
-- **.NET 9.0** – Основа для API
-- **Entity Framework Core** – Для роботи з SQL Server
-- **Microsoft SQL Server** – База даних
-- **Fintacharts API** – Джерело даних про ціни
-- **Swagger** – Документація API
-- **Docker** – Контейнеризація
-
----
-
-## 🛠 Вирішення проблем
-
-- **Помилка підключення до бази даних**:
-  - Перевірте логи SQL Server:
-    ```bash
-    docker logs websocket_api-db-1
-    ```
-  - Переконайтеся, що пароль `sa` відповідає вимогам SQL Server (мін. 8 символів, включаючи великі/малі літери, цифри, спеціальні символи).
-  - Дочекайтеся ініціалізації SQL Server (може зайняти до 30 секунд).
-
-- **Помилка WebSocket**:
-  - Перевірте токен Fintacharts у `appsettings.json`.
-  - Переконайтеся, що `InstrumentId` і `Provider` коректні (використовуйте документацію Fintacharts).
-
-- **Дані не оновлюються**:
-  - Перевірте логи WebSocket:
-    ```bash
-    docker logs websocket_api-api-1
-    ```
-  - Переконайтеся, що WebSocket-з’єднання активне та надходять повідомлення типу `l1-update`.
-
----
