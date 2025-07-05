@@ -1,5 +1,6 @@
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using WebSocket_API.Data;
 using WebSocket_API.Interfaces;
 using WebSocket_API.Repository;
@@ -12,7 +13,18 @@ using Polly;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+// 🔷 Додаємо Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "WebSocket API",
+        Version = "v1",
+        Description = "API for WebSocket financial data processing"
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -36,7 +48,6 @@ builder.Services.AddScoped<IMessageProcessorService, WebSocketMessageProcessorSe
 builder.Services.AddScoped<WebSocketSubscriptionService>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 
-
 builder.Services.AddTransient<FintachartsInstrumentService>();
 builder.Services.AddTransient<FintachartsExchangeService>();
 builder.Services.AddTransient<FintachartsGicsService>();
@@ -57,15 +68,19 @@ builder.Services.AddHostedService<WebSocketClientService>();
 
 var app = builder.Build();
 
+// 🔷 Включаємо Swagger у Development середовищі
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebSocket API V1");
+        c.RoutePrefix = string.Empty; // 👉 відкривати Swagger на корені (localhost:5000/)
+    });
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 var retryPolicy = Policy
