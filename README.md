@@ -35,6 +35,9 @@
 git clone https://github.com/your-repo-url.git
 cd WebSocket_API
 ```
+
+Або встановити docker-compose.yml з репозиторія
+
 ### 2. Побудувати та запустити Docker-контейнери
 
 ```bash
