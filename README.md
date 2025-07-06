@@ -32,7 +32,7 @@
 ### 1. Клонувати репозиторій
 
 ```bash
-git clone https://github.com/your-repo-url.git
+git clone https://github.com/Rostyslav-Bodnar/WebSocketAPI.git
 cd WebSocket_API
 ```
 
